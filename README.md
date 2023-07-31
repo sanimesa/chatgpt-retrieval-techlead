@@ -1,3 +1,6 @@
+# Forked from the techlead repository, the details are below
+
+
 # chatgpt-retrieval
 
 Simple script to use ChatGPT on your own files.
