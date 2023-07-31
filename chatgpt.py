@@ -1,5 +1,6 @@
 import os
 import sys
+from loguru import logger
 
 import openai
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
@@ -10,13 +11,19 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
 from langchain.llms import OpenAI
 from langchain.vectorstores import Chroma
+from langchain.callbacks import FileCallbackHandler
 
 import constants
 
 os.environ["OPENAI_API_KEY"] = constants.APIKEY
 
+logfile = "output.log"
+
+logger.add(logfile, colorize=True, enqueue=True)
+handler = FileCallbackHandler(logfile)
+
 # Enable to save to disk & reuse the model (for repeated queries on the same data)
-PERSIST = False
+PERSIST = True
 
 query = None
 if len(sys.argv) > 1:
@@ -37,6 +44,8 @@ else:
 chain = ConversationalRetrievalChain.from_llm(
   llm=ChatOpenAI(model="gpt-3.5-turbo"),
   retriever=index.vectorstore.as_retriever(search_kwargs={"k": 1}),
+  callbacks=[handler], 
+  verbose=True                                        
 )
 
 chat_history = []
